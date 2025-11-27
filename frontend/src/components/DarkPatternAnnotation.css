@@ -1,0 +1,229 @@
+.dark-pattern-annotation {
+    height: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-lg);
+    overflow-y: auto;
+}
+
+.panel-header {
+    padding-bottom: var(--spacing-md);
+    border-bottom: 1px solid var(--border-color);
+}
+
+.panel-header h2 {
+    font-size: var(--font-size-lg);
+    margin-bottom: var(--spacing-xs);
+}
+
+.panel-header p {
+    font-size: var(--font-size-sm);
+    margin: 0;
+}
+
+/* Summary Stats */
+.summary-stats {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: var(--spacing-sm);
+}
+
+.stat-box {
+    padding: var(--spacing-md);
+    border-radius: var(--radius-md);
+    text-align: center;
+    border: 1px solid;
+}
+
+.stat-box.high {
+    background-color: #fef2f2;
+    border-color: #fecaca;
+}
+
+.stat-box.medium {
+    background-color: #fffbeb;
+    border-color: #fde68a;
+}
+
+.stat-box.low {
+    background-color: #f0fdf4;
+    border-color: #bbf7d0;
+}
+
+.stat-number {
+    font-size: var(--font-size-2xl);
+    font-weight: 700;
+    margin-bottom: var(--spacing-xs);
+}
+
+.stat-label {
+    font-size: var(--font-size-xs);
+    color: var(--text-secondary);
+}
+
+/* Pattern List */
+.pattern-list {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-md);
+}
+
+.pattern-list h3 {
+    font-size: var(--font-size-base);
+    margin-bottom: var(--spacing-sm);
+}
+
+.pattern-card {
+    padding: var(--spacing-md);
+    background-color: white;
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-md);
+    cursor: pointer;
+    transition: all var(--transition-fast);
+    border-left-width: 3px;
+}
+
+.pattern-card.high {
+    border-left-color: var(--danger-color);
+}
+
+.pattern-card.medium {
+    border-left-color: var(--warning-color);
+}
+
+.pattern-card.low {
+    border-left-color: var(--accent-color);
+}
+
+.pattern-card:hover {
+    box-shadow: var(--shadow-md);
+}
+
+.pattern-card.selected {
+    background-color: var(--bg-secondary);
+    border-color: var(--primary-color);
+}
+
+.pattern-header {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    margin-bottom: var(--spacing-sm);
+}
+
+.severity-badge {
+    padding: 2px 6px;
+    border-radius: var(--radius-sm);
+    font-size: 10px;
+    font-weight: 700;
+    letter-spacing: 0.05em;
+}
+
+.severity-badge.high {
+    background-color: var(--danger-color);
+    color: white;
+}
+
+.severity-badge.medium {
+    background-color: var(--warning-color);
+    color: white;
+}
+
+.severity-badge.low {
+    background-color: var(--accent-color);
+    color: white;
+}
+
+.pattern-type {
+    font-size: var(--font-size-sm);
+    font-weight: 600;
+}
+
+.pattern-description {
+    font-size: var(--font-size-sm);
+    color: var(--text-secondary);
+    margin-bottom: var(--spacing-sm);
+    line-height: 1.4;
+}
+
+.pattern-location {
+    display: flex;
+    align-items: center;
+    gap: var(--spacing-xs);
+    font-size: var(--font-size-xs);
+    color: var(--text-muted);
+    margin-bottom: var(--spacing-md);
+}
+
+.location-icon {
+    font-size: var(--font-size-sm);
+}
+
+/* Researcher Notes */
+.researcher-notes {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-xs);
+    padding-top: var(--spacing-sm);
+    border-top: 1px solid var(--border-color);
+}
+
+.researcher-notes label {
+    font-size: var(--font-size-xs);
+    font-weight: 600;
+    color: var(--text-secondary);
+}
+
+.notes-textarea {
+    width: 100%;
+    min-height: 60px;
+    padding: var(--spacing-sm);
+    border: 1px solid var(--border-color);
+    border-radius: var(--radius-sm);
+    font-size: var(--font-size-xs);
+    font-family: var(--font-family);
+    resize: vertical;
+}
+
+.notes-textarea:focus {
+    outline: none;
+    border-color: var(--primary-color);
+}
+
+/* Add Pattern Section */
+.add-pattern-section {
+    padding: var(--spacing-lg);
+    background-color: var(--bg-secondary);
+    border-radius: var(--radius-lg);
+    border: 1px solid var(--border-color);
+}
+
+.add-pattern-section h3 {
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-md);
+}
+
+.add-pattern-form {
+    display: flex;
+    flex-direction: column;
+    gap: var(--spacing-sm);
+}
+
+/* Export Section */
+.export-section {
+    padding: var(--spacing-md);
+    background-color: white;
+    border-radius: var(--radius-md);
+    border: 1px solid var(--border-color);
+}
+
+.export-section h4 {
+    font-size: var(--font-size-sm);
+    margin-bottom: var(--spacing-sm);
+}
+
+.export-buttons {
+    display: grid;
+    grid-template-columns: repeat(2, 1fr);
+    gap: var(--spacing-sm);
+}
