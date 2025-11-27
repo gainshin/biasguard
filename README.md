@@ -50,7 +50,7 @@ Monitors 7 AI-specific manipulative patterns:
 
 ### Interface
 <img src="docs/images/interface-overview.png" width="800" alt="Interface Overview">
-<img src="docs/images/interface-detail.png" width="800" alt="Interface Overview">
+<img src="docs/images/interface-details.png" width="800" alt="Interface Overview">
 
 ### 📊 Transparency-by-Design Scorecard
 8-dimension transparency assessment:
