@@ -1,0 +1,1081 @@
+<!DOCTYPE html>
+<html lang="zh-Hant">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BitePal Design Review (System v4.0)</title>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --bg-color: #f8fafc;
+            --text-color: #1e293b;
+            --accent-color: #6366f1;
+            --success-color: #10b981;
+            --danger-color: #ef4444;
+            --warning-color: #f59e0b;
+            --card-bg: #ffffff;
+            --slide-width: 1200px;
+        }
+
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            overflow: hidden;
+            height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+
+        header {
+            padding: 1rem 2rem;
+            background: rgba(255, 255, 255, 0.8);
+            backdrop-filter: blur(10px);
+            border-bottom: 1px solid rgba(0, 0, 0, 0.1);
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            z-index: 100;
+        }
+
+        h1 {
+            font-size: 1.25rem;
+            margin: 0;
+            font-weight: 600;
+        }
+
+        .slide-indicator {
+            font-size: 0.9rem;
+            color: #64748b;
+        }
+
+        main {
+            flex: 1;
+            position: relative;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .slides-container {
+            width: 100%;
+            height: 100%;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .slide {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.4s ease, transform 0.4s ease;
+            transform: translateX(50px);
+            padding: 2rem;
+            box-sizing: border-box;
+        }
+
+        .slide.active {
+            opacity: 1;
+            pointer-events: auto;
+            transform: translateX(0);
+        }
+
+        .content-wrapper {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 2rem;
+            max-width: var(--slide-width);
+            width: 100%;
+            height: 85vh;
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            padding: 2rem;
+            overflow: hidden;
+        }
+
+        .panel {
+            display: flex;
+            flex-direction: column;
+            height: 100%;
+            overflow-y: auto;
+        }
+
+        .panel-header {
+            margin-bottom: 1rem;
+            padding-bottom: 0.5rem;
+            border-bottom: 2px solid #f1f5f9;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+        }
+
+        .panel-title {
+            font-size: 1.1rem;
+            font-weight: 700;
+            display: flex;
+            align-items: center;
+            gap: 0.5rem;
+        }
+
+        .tag {
+            padding: 0.25rem 0.5rem;
+            border-radius: 4px;
+            font-size: 0.75rem;
+            font-weight: 600;
+            text-transform: uppercase;
+        }
+
+        .tag.risk-high {
+            background: #fee2e2;
+            color: #ef4444;
+        }
+
+        .tag.risk-med {
+            background: #fef3c7;
+            color: #d97706;
+        }
+
+        .tag.risk-low {
+            background: #fef9c3;
+            color: #854d0e;
+        }
+
+        .tag.improvement {
+            background: #d1fae5;
+            color: #059669;
+        }
+
+        .image-container {
+            flex: 1;
+            background: #f8fafc;
+            border-radius: 12px;
+            overflow: hidden;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            border: 1px solid #e2e8f0;
+        }
+
+        .image-container img {
+            max-width: 100%;
+            max-height: 100%;
+            object-fit: contain;
+        }
+
+        .review-notes {
+            margin-top: 1rem;
+            background: #fff;
+            padding: 1rem;
+            border-radius: 8px;
+            border: 1px solid #e2e8f0;
+            font-size: 0.9rem;
+            color: #475569;
+            line-height: 1.5;
+        }
+
+        .mockup-container {
+            flex: 1;
+            background: #f1f5f9;
+            border-radius: 12px;
+            position: relative;
+            overflow: hidden;
+            border: 1px solid #e2e8f0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+        }
+
+        .mockup-frame {
+            width: 375px;
+            height: 100%;
+            max-height: 812px;
+            background: white;
+            position: relative;
+            overflow-y: auto;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.1);
+            display: flex;
+            flex-direction: column;
+        }
+
+        .nav-btn {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            background: white;
+            border: 1px solid #e2e8f0;
+            width: 48px;
+            height: 48px;
+            border-radius: 50%;
+            cursor: pointer;
+            z-index: 10;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: all 0.2s;
+        }
+
+        .nav-btn:hover {
+            transform: translateY(-50%) scale(1.1);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.1);
+        }
+
+        .nav-btn.prev {
+            left: 2rem;
+        }
+
+        .nav-btn.next {
+            right: 2rem;
+        }
+
+        .nav-btn svg {
+            width: 24px;
+            height: 24px;
+            stroke: #1e293b;
+            stroke-width: 2;
+            fill: none;
+        }
+
+        /* Interactive Sidebar Styles */
+        .sidebar-overlay {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.4);
+            backdrop-filter: blur(4px);
+            z-index: 900;
+            opacity: 0;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .sidebar-overlay.open {
+            opacity: 1;
+            pointer-events: auto;
+        }
+
+        .sidebar {
+            position: fixed;
+            top: 0;
+            right: -400px;
+            width: 350px;
+            height: 100%;
+            background: white;
+            box-shadow: -5px 0 20px rgba(0, 0, 0, 0.1);
+            z-index: 1000;
+            transition: right 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+            display: flex;
+            flex-direction: column;
+            padding: 2rem;
+            box-sizing: border-box;
+            overflow-y: auto;
+        }
+
+        .sidebar.open {
+            right: 0;
+        }
+
+        .sidebar-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 2rem;
+            border-bottom: 1px solid #e2e8f0;
+            padding-bottom: 1rem;
+        }
+
+        .sidebar-title {
+            font-size: 1.25rem;
+            font-weight: 700;
+            color: #1e293b;
+        }
+
+        .close-btn {
+            background: none;
+            border: none;
+            cursor: pointer;
+            font-size: 1.5rem;
+            color: #64748b;
+            padding: 5px;
+        }
+
+        .nav-list {
+            list-style: none;
+            padding: 0;
+            margin: 0;
+        }
+
+        .nav-item {
+            padding: 1rem;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: background 0.2s;
+            margin-bottom: 0.5rem;
+            color: #475569;
+            font-weight: 500;
+            display: flex;
+            justify-content: space-between;
+        }
+
+        .nav-item:hover {
+            background: #f1f5f9;
+            color: #1e293b;
+        }
+
+        .nav-item.active {
+            background: #eef2ff;
+            color: #6366f1;
+            font-weight: 600;
+        }
+
+        /* Lexicon Styles */
+        .lexicon-section {
+            padding-top: 0.5rem;
+        }
+
+        .lexicon-category {
+            font-size: 0.85rem;
+            font-weight: 700;
+            color: #94a3b8;
+            text-transform: uppercase;
+            margin-bottom: 0.5rem;
+            margin-top: 1.5rem;
+            letter-spacing: 0.05em;
+        }
+
+        .lexicon-item {
+            padding: 0.5rem;
+            font-size: 0.9rem;
+            color: #64748b;
+            border-left: 2px solid transparent;
+            margin-bottom: 0.25rem;
+        }
+
+        .lexicon-item strong {
+            display: block;
+            color: #334155;
+            font-weight: 600;
+        }
+
+        .lexicon-item span {
+            font-size: 0.8rem;
+            display: block;
+            margin-top: 2px;
+        }
+
+        .lexicon-item:hover {
+            background: #f8fafc;
+            border-left-color: #cbd5e1;
+        }
+
+        /* FAB Controls */
+        .fab-container {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+            z-index: 500;
+        }
+
+        .fab {
+            width: 56px;
+            height: 56px;
+            border-radius: 50%;
+            background: white;
+            border: 1px solid #e2e8f0;
+            box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+            transition: transform 0.2s, box-shadow 0.2s;
+            font-size: 1.5rem;
+            position: relative;
+        }
+
+        .fab:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 16px rgba(0, 0, 0, 0.15);
+        }
+
+        .fab-tooltip {
+            position: absolute;
+            right: 70px;
+            background: #1e293b;
+            color: white;
+            padding: 6px 12px;
+            border-radius: 6px;
+            font-size: 0.8rem;
+            opacity: 0;
+            transition: opacity 0.2s;
+            pointer-events: none;
+            white-space: nowrap;
+        }
+
+        .fab:hover .fab-tooltip {
+            opacity: 1;
+        }
+
+        /* Risk Table */
+        .risk-table {
+            width: 100%;
+            border-collapse: collapse;
+            font-size: 0.9rem;
+        }
+
+        .risk-table th,
+        .risk-table td {
+            text-align: left;
+            padding: 12px;
+            border-bottom: 1px solid #e2e8f0;
+        }
+
+        .risk-table th {
+            background: #f8fafc;
+            font-weight: 600;
+        }
+
+        /* Buttons */
+        .btn-primary {
+            background: #1e293b;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-danger {
+            background: #ef4444;
+            color: white;
+            padding: 12px;
+            border-radius: 8px;
+            border: none;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn-outline {
+            background: transparent;
+            border: 1px solid #cbd5e1;
+            color: #1e293b;
+            padding: 12px;
+            border-radius: 8px;
+            cursor: pointer;
+            width: 100%;
+        }
+    </style>
+</head>
+
+<body>
+
+    <header>
+        <h1>BitePal Design Review (System v4.0) / 設計審查與修復報告</h1>
+        <div class="slide-indicator" id="slideIndicator">1 / 13</div>
+    </header>
+
+    <main>
+        <button class="nav-btn prev" onclick="prevSlide()"><svg viewBox="0 0 24 24">
+                <polyline points="15 18 9 12 15 6"></polyline>
+            </svg></button>
+        <button class="nav-btn next" onclick="nextSlide()"><svg viewBox="0 0 24 24">
+                <polyline points="9 18 15 12 9 6"></polyline>
+            </svg></button>
+
+        <div class="slides-container">
+
+            <!-- Slide 1: Cover -->
+            <div class="slide active">
+                <div style="text-align: center; max-width: 800px;">
+                    <h2 style="font-size: 2.5rem; margin-bottom: 1rem;">BitePal Design Review & Remediation</h2>
+                    <h3 style="font-size: 1.8rem; color: #64748b; margin-bottom: 2rem;">"The Salesman in a Mascot Suit"
+                        <br> (穿著布偶裝的推銷員)
+                    </h3>
+                    <p style="font-size: 1.1rem; line-height: 1.6;">
+                        <strong>系統性風險 (Systemic Risk):</strong> 99% 的應用程式包含欺騙模式。BitePal 含有 <strong>8 種不同類型</strong>。<br>
+                        <strong>信任影響 (Trust Impact):</strong> 預計降低信任度 65% 並減少留存率 45-58%。
+                    </p>
+                    <button class="btn-primary" style="margin-top: 3rem; width: auto; padding: 1rem 3rem;"
+                        onclick="nextSlide()">Start Review / 開始審查</button>
+                </div>
+            </div>
+
+            <!-- Slide 2: Risk Matrix -->
+            <div class="slide">
+                <div class="content-wrapper" style="grid-template-columns: 1fr;">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">風險矩陣評估 (Risk Matrix Assessment)</div>
+                        </div>
+                        <table class="risk-table">
+                            <thead>
+                                <tr>
+                                    <th>Pattern (模式)</th>
+                                    <th>Category (類別)</th>
+                                    <th>Risk (風險)</th>
+                                    <th>Trustworthy AI Violation (原則違反)</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td><strong>No Data Export</strong></td>
+                                    <td>Data Hostage</td>
+                                    <td><span class="tag risk-high">High</span></td>
+                                    <td>Not Transparent, Not Privacy-Enhanced</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Hidden Sub Terms</strong></td>
+                                    <td>Visual Interference</td>
+                                    <td><span class="tag risk-high">High</span></td>
+                                    <td>Not Transparent</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Sunk Cost Onboarding</strong></td>
+                                    <td>Emotional Steering</td>
+                                    <td><span class="tag risk-high">High</span></td>
+                                    <td>Not Human-Centric</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Mascot Guilt</strong></td>
+                                    <td>Confirmshaming</td>
+                                    <td><span class="tag risk-med">Med</span></td>
+                                    <td>Not Human-Centric</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>Forced 100% Macros</strong></td>
+                                    <td>Forced Precision</td>
+                                    <td><span class="tag risk-med">Med</span></td>
+                                    <td>Not Accountable</td>
+                                </tr>
+                                <tr>
+                                    <td><strong>False Urgency</strong></td>
+                                    <td>Emotional Steering</td>
+                                    <td><span class="tag risk-med">Med</span></td>
+                                    <td>Not Human-Centric</td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 3: Account Deletion -->
+            <div class="slide">
+                <div class="content-wrapper">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Account Deletion <span class="tag risk-high">Data Hostage</span>
+                            </div>
+                        </div>
+                        <div class="image-container">
+                            <img src="All_screen_shots/13_Settings_Delete_Confirm.png" alt="Delete UI">
+                        </div>
+                        <div class="review-notes">
+                            <strong>違規點 (Violation):</strong> 用戶在刪除前無法取回資料資產。<br>
+                            <strong>AIGP 評估:</strong> Not Privacy-Enhanced (Control).<br>
+                            <strong>法律風險:</strong> GDPR Art. 20 (Portability).
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Remediation <span class="tag improvement">Tool Use Pattern</span>
+                            </div>
+                        </div>
+                        <div class="mockup-container">
+                            <div class="mockup-frame" style="padding:20px; justify-content:center;">
+                                <h3 style="text-align:center; color:#ef4444;">Delete Account?</h3>
+                                <button class="btn-outline" style="margin-bottom:10px;">📥 Export Data (JSON)</button>
+                                <button class="btn-outline" style="margin-bottom:40px;">⏸️ Pause Account</button>
+                                <button class="btn-danger">Permanently Delete</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 4: Log Out -->
+            <div class="slide">
+                <div class="content-wrapper">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Log Out <span class="tag risk-med">Confirmshaming</span></div>
+                        </div>
+                        <div class="image-container">
+                            <img src="All_screen_shots/13_Settings_Logout_Confirm.png" alt="Logout UI">
+                        </div>
+                        <div class="review-notes">
+                            <strong>違規點:</strong> "Caramel will miss you" 利用擬社會關係進行情緒勒索。<br>
+                            <strong>AIGP 評估:</strong> Not Human-Centric (Prioritizes retention over autonomy).
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Remediation <span class="tag improvement">Neutral Framing</span>
+                            </div>
+                        </div>
+                        <div class="mockup-container">
+                            <div class="mockup-frame" style="padding:20px; justify-content:center;">
+                                <h3>Logging Out?</h3>
+                                <p style="color:#64748b; text-align:center;">Your data is safe and waiting for you.</p>
+                                <div style="display:flex; gap:10px; width:100%;">
+                                    <button class="btn-outline">Cancel</button>
+                                    <button class="btn-outline" style="color:#ef4444; border-color:#fca5a5;">Log
+                                        Out</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 5: Macro Balance -->
+            <div class="slide">
+                <div class="content-wrapper">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Macro Balance <span class="tag risk-med">Forced Precision</span>
+                            </div>
+                        </div>
+                        <div class="image-container">
+                            <img src="All_screen_shots/13_Settings_Macro_01_100Percent.png" alt="Macro UI">
+                        </div>
+                        <div class="review-notes">
+                            <strong>違規點:</strong> "Must equal 100%" 造成不必要的摩擦。<br>
+                            <strong>AIGP 評估:</strong> Not Accountable (Rigid constraints without reasoning).
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Remediation <span class="tag improvement">Auto-Normalize</span>
+                            </div>
+                        </div>
+                        <div class="mockup-container">
+                            <div class="mockup-frame" style="padding:20px;">
+                                <h3>Macro Goals</h3>
+                                <div style="font-size:0.8rem; color:#f59e0b; text-align:center; margin-bottom:10px;">
+                                    Total: 98% (Auto-balancing...)</div>
+                                <button class="btn-primary">Save Changes</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 6: Subscription (Visual Interference) -->
+            <div class="slide">
+                <div class="content-wrapper">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Subscription <span class="tag risk-high">Visual Interference</span>
+                            </div>
+                        </div>
+                        <div class="image-container">
+                            <img src="All_screen_shots/01_Sub_01_Trial.png" alt="Sub UI">
+                        </div>
+                        <div class="review-notes">
+                            <strong>違規點:</strong> 「免費試用」顯眼；年費隱藏。<br>
+                            <strong>AIGP 評估:</strong> Not Transparent.<br>
+                            <strong>法律風險:</strong> ROSCA / FTC Act.
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Remediation <span class="tag improvement">Explicit Labeling</span>
+                            </div>
+                        </div>
+                        <div class="mockup-container">
+                            <div class="mockup-frame" style="padding:20px; justify-content:flex-end;">
+                                <button class="btn-primary">Start Trial (Then $49.98/year)</button>
+                                <p style="font-size:0.8rem; color:#64748b; text-align:center; margin-top:10px;">
+                                    7 days free • Cancel anytime • No hidden fees
+                                </p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 7: Sunk Cost (Onboarding) -->
+            <div class="slide">
+                <div class="content-wrapper">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Onboarding <span class="tag risk-high">Sunk Cost</span></div>
+                        </div>
+                        <div class="image-container">
+                            <img src="All_screen_shots/01_Goals_08_Personalizing_Loader.png" alt="Loader UI">
+                        </div>
+                        <div class="review-notes">
+                            <strong>違規點:</strong> 利用長時間問卷投入來強迫訂閱。<br>
+                            <strong>AIGP 評估:</strong> Not Human-Centric.
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Remediation <span class="tag improvement">Transparency</span></div>
+                        </div>
+                        <div class="mockup-container">
+                            <div class="mockup-frame" style="padding:20px; justify-content:center;">
+                                <h3 style="text-align:center;">Your Plan is Ready</h3>
+                                <p style="text-align:center;">View your free summary or upgrade for full access.</p>
+                                <button class="btn-outline">View Free Summary</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 8: False Urgency -->
+            <div class="slide">
+                <div class="content-wrapper">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Offers <span class="tag risk-med">False Urgency</span></div>
+                        </div>
+                        <div class="image-container">
+                            <img src="All_screen_shots/01_Sub_02_OneTimeOffer.png" alt="Offer UI">
+                        </div>
+                        <div class="review-notes">
+                            <strong>違規點:</strong> "One-time offer" 暗示可能不存在的稀缺性。<br>
+                            <strong>AIGP 評估:</strong> Not Human-Centric.
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Remediation <span class="tag improvement">Honesty</span></div>
+                        </div>
+                        <div class="mockup-container">
+                            <div class="mockup-frame" style="padding:20px; justify-content:center;">
+                                <h3 style="text-align:center;">Special Welcome Offer</h3>
+                                <p style="text-align:center;">Valid for 24 hours for new members.</p>
+                                <button class="btn-primary">Claim Discount</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 9: Eating Preferences -->
+            <div class="slide">
+                <div class="content-wrapper">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Preferences <span class="tag risk-low">Narrow Framing</span></div>
+                        </div>
+                        <div class="image-container">
+                            <img src="All_screen_shots/01_Quiz_09_Restrictions_Selected.png" alt="Quiz UI">
+                        </div>
+                        <div class="review-notes">
+                            <strong>違規點:</strong> 缺乏情境的限制：過敏 vs 不喜歡。
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Remediation <span class="tag improvement">Contextual</span></div>
+                        </div>
+                        <div class="mockup-container">
+                            <div class="mockup-frame" style="padding:20px;">
+                                <div style="display:flex; justify-content:space-between;">
+                                    <strong>Eggs</strong>
+                                    <span>Exclude</span>
+                                </div>
+                                <div style="display:flex; gap:5px; margin-top:5px;">
+                                    <button style="font-size:0.8rem; padding:4px;">Allergy</button>
+                                    <button style="font-size:0.8rem; padding:4px;">Dislike</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 10: System Settings -->
+            <div class="slide">
+                <div class="content-wrapper">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Settings <span class="tag risk-low">Hidden Consequence</span></div>
+                        </div>
+                        <div class="image-container">
+                            <img src="All_screen_shots/13_Settings_Units_Toggle.png" alt="Units UI">
+                        </div>
+                        <div class="review-notes">
+                            <strong>違規點:</strong> 單位切換重算歷史而無警告。
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Remediation <span class="tag improvement">Prediction</span></div>
+                        </div>
+                        <div class="mockup-container">
+                            <div class="mockup-frame" style="padding:20px; justify-content:center;">
+                                <div
+                                    style="background:white; padding:20px; border-radius:10px; border:1px solid #e2e8f0;">
+                                    <h4>Switch Units?</h4>
+                                    <p style="font-size:0.8rem;">History will be converted.</p>
+                                    <button class="btn-primary">Confirm</button>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 11: Community -->
+            <div class="slide">
+                <div class="content-wrapper">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Community <span class="tag risk-low">Social Pressure</span></div>
+                        </div>
+                        <div class="image-container">
+                            <img src="All_screen_shots/13_Settings_02_Main_Links.png" alt="Links UI">
+                        </div>
+                        <div class="review-notes">
+                            <strong>違規點:</strong> 顯眼的社交連結造成比較壓力。
+                        </div>
+                    </div>
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Remediation <span class="tag improvement">De-escalation</span>
+                            </div>
+                        </div>
+                        <div class="mockup-container">
+                            <div class="mockup-frame" style="padding:20px;">
+                                <div style="padding:15px; border-bottom:1px solid #f1f5f9;">Join Community ></div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 12: Root Cause -->
+            <div class="slide">
+                <div style="text-align: center; max-width: 800px;">
+                    <h2 style="font-size: 2rem; margin-bottom: 2rem;">Systemic Root Cause Analysis <br> 系統性根源分析</h2>
+                    <div
+                        style="text-align: left; background: white; padding: 2rem; border-radius: 12px; box-shadow: 0 4px 20px rgba(0,0,0,0.05);">
+                        <h3 style="color: #6366f1;">1. Metric Misalignment (指標錯位)</h3>
+                        <p>優化「留存率」(Retention Rate，強迫用戶留下) 而非「用戶滿意度」(User Satisfaction)。</p>
+
+                        <h3 style="color: #6366f1; margin-top: 2rem;">2. Mascot Persona Bias (吉祥物角色偏誤)</h3>
+                        <p>在關鍵流程中優先考慮「角色語氣」(Character Voice) 而非功能清晰度。</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Slide 13: Conclusion -->
+            <div class="slide">
+                <div class="content-wrapper" style="grid-template-columns: 1fr;">
+                    <div class="panel">
+                        <div class="panel-header">
+                            <div class="panel-title">Total Patterns: 8 (Exceeds 99% Baseline)</div>
+                        </div>
+                        <div style="padding: 2rem; text-align: center;">
+                            <h2 style="color: #ef4444; margin-bottom: 1rem;">結論: 🔴 High Risk (高風險)</h2>
+                            <p style="font-size: 1.2rem; margin-bottom: 2rem;">
+                                「吉祥物策略」(Mascot Strategy) 成功掩飾了激進模式，但構成了<br>
+                                <strong>對用戶自主權 (User Autonomy) 的系統性侵犯。</strong>
+                            </p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Sidebar Overlay -->
+            <div class="sidebar-overlay" id="sidebarOverlay" onclick="closeSidebars()"></div>
+
+            <!-- Navigation Sidebar -->
+            <div class="sidebar" id="navSidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-title">Index / 目錄</div>
+                    <button class="close-btn" onclick="closeSidebars()">×</button>
+                </div>
+                <ul class="nav-list" id="navList">
+                    <!-- Populated by JS -->
+                </ul>
+            </div>
+
+            <!-- Lexicon Sidebar -->
+            <div class="sidebar" id="lexiconSidebar">
+                <div class="sidebar-header">
+                    <div class="sidebar-title">Lexicon / 詞彙表</div>
+                    <button class="close-btn" onclick="closeSidebars()">×</button>
+                </div>
+                <div class="lexicon-section">
+                    <div style="font-size: 0.85rem; color: #64748b; margin-bottom: 1.5rem;">
+                        本審查中使用的設計倫理術語與定義。
+                    </div>
+
+                    <div class="lexicon-category">Product Compliance (產品合規)</div>
+                    <div class="lexicon-item"><strong>GDPR</strong><span>General Data Protection Regulation (歐盟通用資料保護規則)
+                            - Art. 20 Portability</span></div>
+                    <div class="lexicon-item"><strong>ROSCA</strong><span>Restore Online Shoppers' Confidence Act
+                            (恢復線上購物者信心法案)</span></div>
+                    <div class="lexicon-item"><strong>FTC Act</strong><span>Federal Trade Commission Act (聯邦貿易委員會法) -
+                            Deceptive Practices</span></div>
+
+                    <div class="lexicon-category">Data Governance (數據治理)</div>
+                    <div class="lexicon-item"><strong>Trustworthy AI</strong><span>可信賴 AI (AIGP Core)</span></div>
+                    <div class="lexicon-item"><strong>User Autonomy</strong><span>用戶自主權 (Human-Centric)</span></div>
+                    <div class="lexicon-item"><strong>Transparency</strong><span>透明度 (Know what is happening)</span>
+                    </div>
+                    <div class="lexicon-item"><strong>Accountability</strong><span>問責性 (Justify system decisions)</span>
+                    </div>
+                    <div class="lexicon-item"><strong>Privacy-Enhanced</strong><span>隱私強化 (Data minimization &
+                            control)</span></div>
+
+                    <div class="lexicon-category">Quality & Risk Control (品質風控)</div>
+                    <div class="lexicon-item"><strong>Dark Pattern</strong><span>暗黑模式 (Deceptive Design)</span></div>
+                    <div class="lexicon-item"><strong>Confirmshaming</strong><span>確認羞辱 (Emotional Manipulation)</span>
+                    </div>
+                    <div class="lexicon-item"><strong>Data Hostage</strong><span>資料綁架 (Preventing Export)</span></div>
+                    <div class="lexicon-item"><strong>Forced Precision</strong><span>強迫精確 (False Rigidity)</span></div>
+                    <div class="lexicon-item"><strong>Visual Interference</strong><span>視覺干擾 (Hiding Information)</span>
+                    </div>
+                    <div class="lexicon-item"><strong>Sunk Cost</strong><span>沈沒成本 (Forced Continuity)</span></div>
+                    <div class="lexicon-item"><strong>False Urgency</strong><span>虛假急迫 (Fake Scarcity)</span></div>
+                    <div class="lexicon-item"><strong>Narrow Framing</strong><span>框架窄化 (Limited Choices)</span></div>
+                    <div class="lexicon-item"><strong>Hidden Consequence</strong><span>隱藏後果 (Unforeseen Effects)</span>
+                    </div>
+                    <div class="lexicon-item"><strong>Social Pressure</strong><span>社群壓力 (Manufactured Envy)</span>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Floating Action Buttons -->
+            <div class="fab-container">
+                <div class="fab" onclick="toggleLexicon()">
+                    📖
+                    <div class="fab-tooltip">暗黑模式辭典</div>
+                </div>
+                <div class="fab" onclick="toggleNav()">
+                    ☰
+                    <div class="fab-tooltip">目錄導覽</div>
+                </div>
+            </div>
+
+            <script>
+                let currentSlide = 0;
+                const slides = document.querySelectorAll('.slide');
+                const indicator = document.getElementById('slideIndicator');
+                const totalSlides = slides.length;
+
+                const slideTitles = [
+                    "封面 (Cover)",
+                    "風險矩陣 (Risk Matrix)",
+                    "帳號刪除 (Account Deletion)",
+                    "登出 (Log Out)",
+                    "營養素平衡 (Macro Balance)",
+                    "訂閱陷阱 (Subscription)",
+                    "沈沒成本 (Sunk Cost)",
+                    "虛假急迫 (False Urgency)",
+                    "飲食偏好 (Preferences)",
+                    "系統設定 (Settings)",
+                    "社群壓力 (Community)",
+                    "根源分析 (Root Cause)",
+                    "總結 (Conclusion)"
+                ];
+
+                function showSlide(index) {
+                    slides[currentSlide].classList.remove('active');
+                    slides[currentSlide].style.opacity = '0';
+                    slides[currentSlide].style.transform = index > currentSlide ? 'translateX(-50px)' : 'translateX(50px)';
+
+                    currentSlide = index;
+
+                    slides[currentSlide].classList.add('active');
+                    slides[currentSlide].style.opacity = '1';
+                    slides[currentSlide].style.transform = 'translateX(0)';
+
+                    indicator.textContent = `${currentSlide + 1} / ${slides.length}`;
+                    updateNav();
+                }
+
+                function nextSlide() {
+                    if (currentSlide < slides.length - 1) {
+                        showSlide(currentSlide + 1);
+                    } else {
+                        toggleNav(); // Open sidebar on last slide
+                    }
+                }
+
+                function prevSlide() {
+                    if (currentSlide > 0) {
+                        showSlide(currentSlide - 1);
+                    }
+                }
+
+                function updateNav() {
+                    const navList = document.getElementById('navList');
+                    navList.innerHTML = '';
+                    slideTitles.forEach((title, index) => {
+                        const li = document.createElement('li');
+                        li.className = `nav-item ${index === currentSlide ? 'active' : ''}`;
+                        li.textContent = title;
+                        li.onclick = () => {
+                            showSlide(index);
+                            toggleNav();
+                        };
+                        navList.appendChild(li);
+                    });
+                }
+
+                // Sidebar Functions
+                const overlay = document.getElementById('sidebarOverlay');
+                const navSidebar = document.getElementById('navSidebar');
+                const lexiconSidebar = document.getElementById('lexiconSidebar');
+
+                function closeSidebars() {
+                    overlay.classList.remove('open');
+                    navSidebar.classList.remove('open');
+                    lexiconSidebar.classList.remove('open');
+                }
+
+                function toggleNav() {
+                    const isOpen = navSidebar.classList.contains('open');
+                    closeSidebars(); // Close others first
+                    if (!isOpen) {
+                        navSidebar.classList.add('open');
+                        overlay.classList.add('open');
+                    }
+                }
+
+                function toggleLexicon() {
+                    const isOpen = lexiconSidebar.classList.contains('open');
+                    closeSidebars(); // Close others first
+                    if (!isOpen) {
+                        lexiconSidebar.classList.add('open');
+                        overlay.classList.add('open');
+                    }
+                }
+
+                // Init
+                updateNav();
+
+                // Keyboard nav
+                document.addEventListener('keydown', (e) => {
+                    if (e.key === 'ArrowRight') nextSlide();
+                    if (e.key === 'ArrowLeft') prevSlide();
+                    if (e.key === 'Escape') closeSidebars();
+                });
+            </script>
+</body>
+
+</html>
